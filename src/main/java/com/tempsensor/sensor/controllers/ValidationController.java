@@ -24,7 +24,6 @@ public class ValidationController {
 
     @GetMapping("post")
     public String post(Map<String, Object> model) {
-        populate(30);
         model.put("msg", "");
         return "post";
     }
