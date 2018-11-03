@@ -2,6 +2,7 @@ package com.tempsensor.sensor.controllers;
 
 import com.tempsensor.sensor.dblayer.SensorStorage;
 import com.tempsensor.sensor.dblayer.SensorStorageRepository;
+import com.tempsensor.sensor.dblayer.WorkingWithDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +17,6 @@ public class ValidationController {
     @Autowired
     private SensorStorageRepository repository;
 
-    private String msg;
-
     @GetMapping
     public String main() {
         return "index";
@@ -25,8 +24,8 @@ public class ValidationController {
 
     @GetMapping("post")
     public String post(Map<String, Object> model) {
-        String msg = "";
-        model.put("msg", msg);
+        populate(30);
+        model.put("msg", "");
         return "post";
     }
 
@@ -39,7 +38,6 @@ public class ValidationController {
     }
 
     private String addToBD(String temp, String longitude, String latitude) {
-        String msg = "";
         try {
             temp = temp.trim();
             longitude = longitude.trim();
@@ -52,13 +50,11 @@ public class ValidationController {
                 if(sensor == null) sensor = new SensorStorage(temp, longitude, latitude);
                 else sensor.setTemperature(temp);
                 repository.save(sensor);
-                msg = "sensor successfully added";
-            } else msg = "wrong temperature";
+                return "sensor successfully added";
+            } else return "wrong temperature";
         } catch(NumberFormatException e) {
-            msg = "invalid input!";
-            return msg;
+            return "invalid input!";
         }
-        return msg;
     }
 
     @GetMapping("get")
@@ -69,4 +65,8 @@ public class ValidationController {
         return "get";
     }
 
+    private void populate(int depth) {
+        WorkingWithDB pop = new WorkingWithDB(repository);
+        pop.populateDB(depth);
+    }
 }
